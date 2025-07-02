@@ -1,7 +1,8 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Bot, BookOpen, LineChart, ShieldCheck, CheckCircle } from "lucide-react";
+import { ArrowRight, Bot, BookOpen, LineChart, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -73,7 +74,7 @@ export default function Home() {
                 </p>
                 <div className="mt-8 flex justify-center gap-4">
                     <Button asChild size="lg" className="font-bold">
-                        <Link href="/markets">Start Trading Now</Link>
+                        <Link href="/signup">Start Trading Now</Link>
                     </Button>
                     <Button asChild size="lg" variant="outline" className="font-bold">
                         <Link href="/resources">Explore Resources</Link>
@@ -119,15 +120,15 @@ export default function Home() {
                         <p className="mt-4 text-lg text-muted-foreground">Our state-of-the-art trading platform provides you with all the tools you need for success. Enjoy fast execution, advanced charting, and a user-friendly interface designed for both beginners and experts.</p>
                         <ul className="mt-6 space-y-4">
                             <li className="flex items-start">
-                                <CheckCircle className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                                <ShieldCheck className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
                                 <span><span className="font-bold">Advanced Charting Tools:</span> Analyze market trends with dozens of indicators and drawing tools.</span>
                             </li>
                             <li className="flex items-start">
-                                <CheckCircle className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                                <ShieldCheck className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
                                 <span><span className="font-bold">Real-Time Data:</span> Get up-to-the-second market data to make informed decisions.</span>
                             </li>
                              <li className="flex items-start">
-                                <CheckCircle className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                                <ShieldCheck className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
                                 <span><span className="font-bold">Cross-Device Sync:</span> Trade seamlessly on web, desktop, and mobile devices.</span>
                             </li>
                         </ul>
@@ -188,7 +189,7 @@ export default function Home() {
             </p>
             <div className="mt-8">
               <Button asChild size="lg" variant="secondary" className="font-bold text-lg">
-                <Link href="/markets">Get Started for Free</Link>
+                <Link href="/signup">Get Started for Free</Link>
               </Button>
             </div>
           </div>
