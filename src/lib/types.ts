@@ -9,3 +9,36 @@ export const ContactFormSchema = z.object({
 });
 
 export type ContactFormValues = z.infer<typeof ContactFormSchema>;
+
+
+export interface TradingPlan {
+  id: number;
+  name: string;
+  minimum_deposit_usd: number;
+  description?: string | null;
+  commission_details?: any;
+  leverage_info?: any;
+  max_open_trades?: number | null;
+  allow_copy_trading: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface AppUser {
+  id: string; // UUID
+  firebase_auth_uid: string;
+  username: string;
+  email: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  phone_number?: string | null;
+  country_code?: string | null;
+  trading_plan_id: number;
+  profile_completed_at?: Date | null;
+  pin_setup_completed_at?: Date | null;
+  is_active: boolean;
+  is_email_verified: boolean;
+  created_at: Date;
+  updated_at: Date;
+  admin_pin?: string | null;
+}
