@@ -20,6 +20,16 @@ export const tradingPlans = [
     id: 2,
     name: 'Personal',
     description: 'Ideal for individual traders looking for more features.',
+    price: '$25',
+    priceDescription: '/ month',
+    features: [
+      'Min. Deposit: $2,500',
+      'All Beginner features',
+      'Access to More Markets',
+      'Webinars Access',
+    ],
+    isPopular: false,
+    buttonText: 'Choose Personal',
   },
   {
     id: 3,
@@ -29,7 +39,7 @@ export const tradingPlans = [
     priceDescription: '/ month',
     features: [
       'Min. Deposit: $5,000',
-      'All Beginner features',
+      'All Personal features',
       'Access to All Markets',
       'Lower Spreads',
       '24/5 Priority Support',
@@ -59,10 +69,30 @@ export const tradingPlans = [
     id: 5,
     name: 'Corporate',
     description: 'Tailored for corporate clients and institutions.',
+    price: 'Contact Us',
+    priceDescription: '',
+    features: [
+        'Min. Deposit: $50,000',
+        'All Pro features',
+        'Customized Solutions',
+        'Institutional Liquidity'
+    ],
+    isPopular: false,
+    buttonText: 'Contact Sales',
   },
   {
     id: 6,
     name: 'Enterprise',
     description: 'Top-tier plan with maximum benefits and support.',
+    price: 'Contact Us',
+    priceDescription: '',
+    features: [
+        'Min. Deposit: $100,000',
+        'All Corporate features',
+        'Bespoke infrastructure',
+        'White-label solutions',
+    ],
+    isPopular: false,
+    buttonText: 'Contact Sales',
   },
 ];
