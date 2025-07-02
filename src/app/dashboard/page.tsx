@@ -37,7 +37,7 @@ const StatCard = ({ title, value, icon: Icon, unit = '$', color = 'text-foregrou
 );
 
 export default function DashboardPage() {
-  const { user, loading: authIsLoading } = useAuth();
+  const { appUser, loading: authIsLoading } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -47,11 +47,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (user) {
+      if (appUser) {
         setLoading(true);
         setFetchError(null);
         try {
-          const dashboardData = await getDashboardData(user.uid);
+          const dashboardData = await getDashboardData(appUser.firebase_auth_uid);
           if (dashboardData) {
             setData(dashboardData);
           } else {
@@ -66,7 +66,7 @@ export default function DashboardPage() {
       }
     }
     fetchData();
-  }, [user]);
+  }, [appUser]);
 
   useEffect(() => {
     const fetchImage = async () => {

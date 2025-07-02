@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -43,7 +44,7 @@ const navItems = [
 export function DashboardHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuth();
+  const { appUser } = useAuth();
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -120,13 +121,13 @@ export function DashboardHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${user?.email || 'A'}`} alt={user?.email || 'User'}/>
-                <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || 'A'}</AvatarFallback>
+                <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${appUser?.username || 'A'}`} alt={appUser?.username || 'User'}/>
+                <AvatarFallback>{appUser?.email?.charAt(0).toUpperCase() || 'A'}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user?.email}</DropdownMenuLabel>
+            <DropdownMenuLabel>{appUser?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link href="/dashboard/profile">Profile</Link></DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>

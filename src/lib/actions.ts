@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type ContactFormValues, type DashboardData } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -171,4 +171,25 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
   } finally {
     client.release();
   }
+}
+
+export async function getUserByFirebaseUid(firebaseUid: string): Promise<AppUser | null> {
+    if (!firebaseUid) return null;
+
+    const client = await db.getClient();
+    try {
+        const query = 'SELECT * FROM users WHERE firebase_auth_uid = $1';
+        const result = await client.query(query, [firebaseUid]);
+
+        if (result.rows.length > 0) {
+            return result.rows[0] as AppUser;
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Database error fetching user by Firebase UID:', error);
+        return null;
+    } finally {
+        client.release();
+    }
 }
