@@ -5,15 +5,20 @@ import { ContactFormSchema, type AppUser, type ContactFormValues, type Dashboard
 import { db } from './db';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function submitContactForm(values: ContactFormValues) {
     const parsed = ContactFormSchema.safeParse(values);
 
     if (!parsed.success) {
         return { success: false, message: "Invalid form data." };
     }
-
+    
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey || apiKey === 'YOUR_RESEND_API_KEY') {
+      console.error('Resend API Key is not configured.');
+      return { success: false, message: 'This feature is not available at the moment. Please contact us directly.' };
+    }
+    
+    const resend = new Resend(apiKey);
     const { name, email, subject, message } = parsed.data;
 
     try {
@@ -120,6 +125,12 @@ export async function getImageByContextTag(tag: string): Promise<{ imageUrl: str
     `;
     const result = await client.query(query, [tag]);
     if (result.rows.length > 0) {
+      const imageUrl = result.rows[0].image_url;
+      // Filter out URLs from the old, contaminated domain to prevent crashes.
+      if (imageUrl && imageUrl.includes('yosjqhioxjfywkdaaflv.supabase.co')) {
+        console.warn(`[Data Contamination] Filtered out an image from an old domain for tag: ${tag}`);
+        return null;
+      }
       return {
         imageUrl: result.rows[0].image_url,
         altText: result.rows[0].alt_text || 'Apexora promotional image',
