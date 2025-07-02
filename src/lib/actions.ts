@@ -180,9 +180,17 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
     const copyTradesResult = await client.query(copyTradesQuery, [user.id]);
     const activeCopyTrades = parseInt(copyTradesResult.rows[0].count, 10);
     
-    // Mocked data for now
-    const totalDeposited = 65000.00;
-    const totalWithdrawn = 0.00;
+    const transactionTotalsQuery = `
+      SELECT
+        SUM(CASE WHEN transaction_type = 'deposit' AND status = 'completed' THEN amount_usd_equivalent ELSE 0 END) as total_deposited,
+        SUM(CASE WHEN transaction_type = 'withdrawal' AND status = 'completed' THEN amount_usd_equivalent ELSE 0 END) as total_withdrawn
+      FROM transactions
+      WHERE user_id = $1;
+    `;
+    const transactionTotalsResult = await client.query(transactionTotalsQuery, [user.id]);
+    const totals = transactionTotalsResult.rows[0];
+    const totalDeposited = parseFloat(totals.total_deposited || '0');
+    const totalWithdrawn = parseFloat(totals.total_withdrawn || '0');
 
     return {
       username: user.username,
