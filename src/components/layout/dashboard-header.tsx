@@ -1,4 +1,3 @@
-
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,7 +15,8 @@ import {
   Users,
   ArrowDownToLine,
   ArrowUpFromLine,
-  History
+  History,
+  LifeBuoy
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,6 +39,7 @@ const navItems = [
     { href: "/dashboard/deposit", label: "Deposit Funds", icon: ArrowDownToLine },
     { href: "/dashboard/withdraw", label: "Withdraw Funds", icon: ArrowUpFromLine },
     { href: "/dashboard/transactions", label: "Transactions", icon: History },
+    { href: "/dashboard/support", label: "Support", icon: LifeBuoy },
 ];
 
 export function DashboardHeader() {
@@ -55,6 +56,9 @@ export function DashboardHeader() {
     const currentNavItem = navItems.find(item => pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard'));
     if (currentNavItem) {
         return currentNavItem.label;
+    }
+    if (pathname.startsWith('/dashboard/copy-trading/')) {
+        return "Trader Profile";
     }
     if (pathname.startsWith('/dashboard/')) {
         const title = pathname.split('/')[2];
@@ -131,7 +135,7 @@ export function DashboardHeader() {
             <DropdownMenuLabel>{appUser?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link href="/dashboard/profile">Profile</Link></DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem asChild><Link href="/dashboard/support">Support</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>

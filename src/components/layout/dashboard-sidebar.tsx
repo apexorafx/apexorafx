@@ -12,6 +12,7 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   History,
+  LifeBuoy,
 } from "lucide-react";
 
 const navItems = [
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/dashboard/deposit", label: "Deposit Funds", icon: ArrowDownToLine },
   { href: "/dashboard/withdraw", label: "Withdraw Funds", icon: ArrowUpFromLine },
   { href: "/dashboard/transactions", label: "Transactions", icon: History },
+  { href: "/dashboard/support", label: "Support", icon: LifeBuoy },
 ];
 
 export function DashboardSidebar() {
