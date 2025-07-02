@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Bot, BookOpen, LineChart, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getImageByContextTag } from "@/lib/actions";
 
 const features = [
   {
@@ -57,7 +58,9 @@ const testimonials = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const platformImage = await getImageByContextTag('trading_platforms_overview_main');
+  
   return (
     <div className="flex flex-col min-h-dvh">
       <main className="flex-1">
@@ -138,8 +141,8 @@ export default function Home() {
                     </div>
                     <div className="mt-8 md:mt-0">
                         <Image
-                            src="https://placehold.co/600x400.png"
-                            alt="Apexora trading platform interface"
+                            src={platformImage?.imageUrl || "https://placehold.co/600x400.png"}
+                            alt={platformImage?.altText || "Apexora trading platform interface"}
                             data-ai-hint="trading dashboard"
                             width={600}
                             height={400}

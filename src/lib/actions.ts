@@ -94,3 +94,25 @@ export async function createUserInDb(data: { firebaseUid: string; email: string;
     client.release();
   }
 }
+
+export async function getImageByContextTag(tag: string): Promise<{ imageUrl: string; altText: string } | null> {
+  const client = await db.getClient();
+  try {
+    const query = `
+      SELECT image_url, alt_text FROM images WHERE context_tag = $1 LIMIT 1;
+    `;
+    const result = await client.query(query, [tag]);
+    if (result.rows.length > 0) {
+      return {
+        imageUrl: result.rows[0].image_url,
+        altText: result.rows[0].alt_text || 'Apexora promotional image',
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`Database error fetching image with tag "${tag}":`, error);
+    return null; // Return null on error to avoid breaking the page
+  } finally {
+    client.release();
+  }
+}

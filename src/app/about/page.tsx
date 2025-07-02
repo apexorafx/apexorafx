@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Eye, Users, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import { getImageByContextTag } from "@/lib/actions";
 
 const values = [
   {
@@ -21,7 +22,9 @@ const values = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const storyImage = await getImageByContextTag('about_page_generic_promo');
+
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -51,8 +54,8 @@ export default function AboutPage() {
             </div>
              <div className="mt-8 md:mt-0">
               <Image
-                src="https://placehold.co/600x400.png"
-                alt="Apexora office"
+                src={storyImage?.imageUrl || "https://placehold.co/600x400.png"}
+                alt={storyImage?.altText || "About Apexora FX Hub"}
                 data-ai-hint="modern office"
                 width={600}
                 height={400}
