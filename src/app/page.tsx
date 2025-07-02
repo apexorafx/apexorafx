@@ -1,11 +1,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Bot, BookOpen, LineChart, ShieldCheck } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { getImageByContextTag } from "@/lib/actions";
+import { tradingPlans } from "@/lib/plans";
+import { cn } from "@/lib/utils";
+import { ArrowRight, Bot, BookOpen, Check, LineChart, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getImageByContextTag } from "@/lib/actions";
 
 const features = [
   {
@@ -153,9 +156,53 @@ export default async function Home() {
             </div>
         </section>
 
+        {/* Trading Plans Section */}
+        <section className="py-16 md:py-24 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold font-headline">Find the Right Plan for You</h2>
+              <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader.</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              {tradingPlans.filter(p => [1,3,4].includes(p.id)).map((plan) => (
+                <Card key={plan.id} className={cn(
+                  "flex flex-col h-full relative",
+                  plan.isPopular ? "border-primary shadow-2xl scale-105" : "hover:shadow-xl transition-shadow"
+                )}>
+                  {plan.isPopular && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Most Popular</Badge>
+                  )}
+                  <CardHeader className="text-center">
+                    <CardTitle className="font-headline text-2xl">{plan.name}</CardTitle>
+                    <CardDescription>{plan.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex flex-col">
+                    <div className="text-center mb-6">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-muted-foreground">{plan.priceDescription}</span>
+                    </div>
+                    <ul className="space-y-4 flex-grow">
+                      {plan.features.map((feature, index) => (
+                        <li key={index} className="flex items-start">
+                          <Check className="w-5 h-5 text-financial-green mr-3 flex-shrink-0 mt-1" />
+                          <span className="text-muted-foreground">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter>
+                    <Button asChild className="w-full font-bold" variant={plan.isPopular ? "default" : "outline"}>
+                      <Link href="/signup">{plan.buttonText}</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 md:py-24 bg-background">
+        <section className="py-16 md:py-24 bg-secondary/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Trusted by Traders Worldwide</h2>
