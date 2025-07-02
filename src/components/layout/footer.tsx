@@ -96,9 +96,6 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Apexora FX Hub. All rights
             reserved.
           </p>
-          <p className="mt-2">
-            This is a fictional application built for demonstration purposes.
-          </p>
         </div>
       </div>
     </footer>
