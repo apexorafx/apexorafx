@@ -163,10 +163,10 @@ export default async function Home() {
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Find the Right Plan for You</h2>
               <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader. <Link href="/pricing" className="text-primary hover:underline">View all plans</Link>.</p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-              {tradingPlans.filter(p => [1,3,4].includes(p.id)).map((plan) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+              {tradingPlans.map((plan) => (
                 <Card key={plan.id} className={cn(
-                  "flex flex-col h-full relative",
+                  "flex flex-col h-full",
                   plan.isPopular ? "border-primary shadow-2xl scale-105" : "hover:shadow-xl transition-shadow"
                 )}>
                   {plan.isPopular && (
