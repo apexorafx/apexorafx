@@ -59,7 +59,7 @@ const testimonials = [
 ];
 
 export default async function Home() {
-  const platformImage = await getImageByContextTag('trading_platforms_overview_main');
+  const platformImage = await getImageByContextTag('trading_platforms_overview_main', 'trading dashboard');
   
   return (
     <div className="flex flex-col min-h-dvh">

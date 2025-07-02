@@ -15,6 +15,7 @@ const resourceSections = [
         type: "Course",
         icon: <BookOpen className="w-6 h-6 text-primary" />,
         tag: "resource_course_beginners",
+        hint: "online course trading",
         description: "A comprehensive course covering the fundamentals of trading.",
         link: "#",
       },
@@ -23,6 +24,7 @@ const resourceSections = [
         type: "Video",
         icon: <Video className="w-6 h-6 text-primary" />,
         tag: "resource_video_analysis",
+        hint: "technical analysis chart",
         description: "Deep dive into chart patterns, indicators, and strategies.",
         link: "#",
       },
@@ -31,6 +33,7 @@ const resourceSections = [
         type: "Webinar",
         icon: <MonitorPlay className="w-6 h-6 text-primary" />,
         tag: "resource_webinar_outlook",
+        hint: "webinar presentation screen",
         description: "Join our experts live as they analyze upcoming market events.",
         link: "#",
       },
@@ -39,6 +42,7 @@ const resourceSections = [
         type: "Podcast",
         icon: <Podcast className="w-6 h-6 text-primary" />,
         tag: "resource_podcast_mindset",
+        hint: "podcast microphone setup",
         description: "Listen to interviews with successful traders and psychologists.",
         link: "#",
       },
@@ -47,6 +51,7 @@ const resourceSections = [
         type: "Event",
         icon: <Calendar className="w-6 h-6 text-primary" />,
         tag: "resource_event_summit",
+        hint: "conference event trading",
         description: "Connect with fellow traders and learn from industry leaders.",
         link: "#",
       },
@@ -55,6 +60,7 @@ const resourceSections = [
         type: "E-book",
         icon: <FileText className="w-6 h-6 text-primary" />,
         tag: "resource_ebook_risk",
+        hint: "ebook on tablet",
         description: "A practical guide to protecting your capital while trading.",
         link: "#",
       },
@@ -69,6 +75,7 @@ const resourceSections = [
         type: "Platform",
         icon: <Globe className="w-6 h-6 text-primary" />,
         tag: "resource_platform_webtrader",
+        hint: "trading platform interface",
         description: "Master our powerful, browser-based trading platform.",
         link: "#",
       },
@@ -77,6 +84,7 @@ const resourceSections = [
         type: "Tutorial",
         icon: <Code className="w-6 h-6 text-primary" />,
         tag: "resource_tutorial_api",
+        hint: "coding API documentation",
         description: "Build your own automated trading strategies with our API.",
         link: "#",
       },
@@ -85,6 +93,7 @@ const resourceSections = [
         type: "Glossary",
         icon: <BookOpen className="w-6 h-6 text-primary" />,
         tag: "resource_glossary",
+        hint: "financial dictionary book",
         description: "Your guide to all the essential trading terminology.",
         link: "#",
       },
@@ -93,13 +102,24 @@ const resourceSections = [
 ];
 
 export default async function ResourcesPage() {
-  const allImageTags = resourceSections.flatMap(section => section.items.map(item => item.tag));
-  const imageResults = await Promise.all(allImageTags.map(tag => getImageByContextTag(tag)));
+  const allImageRequests = resourceSections.flatMap(section => 
+    section.items.map(item => getImageByContextTag(item.tag, item.hint))
+  );
+  const imageResults = await Promise.all(allImageRequests);
   
-  const images = allImageTags.reduce((acc, tag, index) => {
-    acc[tag] = imageResults[index];
+  const imagesByTag = resourceSections.flat().reduce((acc, section) => {
+    section.items.forEach(item => {
+      // This mapping assumes the order of requests matches the flattened items
+    });
     return acc;
   }, {} as Record<string, { imageUrl: string; altText: string } | null>);
+
+  let imageIndex = 0;
+  resourceSections.forEach(section => {
+    section.items.forEach(item => {
+      (imagesByTag as any)[item.tag] = imageResults[imageIndex++];
+    });
+  });
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -118,7 +138,7 @@ export default async function ResourcesPage() {
           <p className="mt-2 text-muted-foreground">{section.description}</p>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {section.items.map((item) => {
-              const image = images[item.tag];
+              const image = (imagesByTag as any)[item.tag];
               return (
                 <Card key={item.title} className="flex flex-col overflow-hidden hover:shadow-xl transition-shadow duration-300">
                   <CardHeader className="p-0">
@@ -129,7 +149,7 @@ export default async function ResourcesPage() {
                         width={600}
                         height={400}
                         className="w-full h-48 object-cover"
-                        data-ai-hint={item.tag.replace(/_/g, ' ')}
+                        data-ai-hint={item.hint}
                       />
                        <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm p-2 rounded-md flex items-center gap-2 text-sm">
                           {item.icon}

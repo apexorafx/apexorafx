@@ -24,8 +24,8 @@ const values = [
 
 export default async function AboutPage() {
   const [storyImage, securityImage] = await Promise.all([
-    getImageByContextTag('about_page_generic_promo'),
-    getImageByContextTag('about_page_security_promo'),
+    getImageByContextTag('about_page_generic_promo', 'modern office'),
+    getImageByContextTag('about_page_security_promo', 'security shield'),
   ]);
 
   return (

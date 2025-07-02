@@ -1,9 +1,10 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema, type DepositFormValues, type TransactionHistoryEntry } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema, type DepositFormValues, type TransactionHistoryEntry, BankWithdrawalFormSchema, BTCWithdrawalFormSchema } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
+import { generateImage } from '@/ai/flows/generate-image-flow';
 
 export async function submitContactForm(values: ContactFormValues) {
     const parsed = ContactFormSchema.safeParse(values);
@@ -117,29 +118,47 @@ export async function checkUsernameExists(username: string) {
 }
 
 
-export async function getImageByContextTag(tag: string): Promise<{ imageUrl: string; altText: string } | null> {
+export async function getImageByContextTag(tag: string, hint: string): Promise<{ imageUrl: string; altText: string } | null> {
   const client = await db.getClient();
   try {
-    const query = `
+    const selectQuery = `
       SELECT image_url, alt_text FROM images WHERE context_tag = $1 LIMIT 1;
     `;
-    const result = await client.query(query, [tag]);
-    if (result.rows.length > 0) {
-      const imageUrl = result.rows[0].image_url;
-      // This is the critical filter to prevent contaminated data from being used.
-      if (imageUrl && imageUrl.includes('yosjqhioxjfywkdaaflv.supabase.co')) {
-        console.warn(`Filtered out contaminated image URL for tag: ${tag}`);
-        return null;
+    const selectResult = await client.query(selectQuery, [tag]);
+
+    if (selectResult.rows.length > 0) {
+      const imageUrl = selectResult.rows[0].image_url;
+      // Filter out invalid placeholder URLs.
+      if (imageUrl && !imageUrl.startsWith('data:image/')) {
+        console.warn(`Filtered out invalid image URL for tag: ${tag}. Will regenerate.`);
+      } else {
+        return {
+          imageUrl: imageUrl,
+          altText: selectResult.rows[0].alt_text || 'Apexora promotional image',
+        };
       }
-      return {
-        imageUrl,
-        altText: result.rows[0].alt_text || 'Apexora promotional image',
-      };
     }
+
+    // If no valid image is found, generate a new one.
+    console.log(`No valid image found for tag "${tag}". Generating new image with hint: "${hint}"`);
+    const newImage = await generateImage({ prompt: hint });
+
+    if (newImage && newImage.imageUrl) {
+      const upsertQuery = `
+        INSERT INTO images (context_tag, image_url, alt_text)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (context_tag) DO UPDATE
+        SET image_url = EXCLUDED.image_url, alt_text = EXCLUDED.alt_text;
+      `;
+      await client.query(upsertQuery, [tag, newImage.imageUrl, newImage.altText]);
+      console.log(`Successfully generated and saved new image for tag "${tag}".`);
+      return newImage;
+    }
+
     return null;
   } catch (error) {
-    console.error(`Database error fetching image with tag "${tag}":`, error);
-    return null; // Return null on error to avoid breaking the page
+    console.error(`Database error or image generation failed for tag "${tag}":`, error);
+    return null;
   } finally {
     client.release();
   }
@@ -495,4 +514,16 @@ export async function getTransactionHistory(userId: string): Promise<Transaction
   } finally {
     client.release();
   }
+}
+
+export async function createWithdrawalRequest(
+  userId: string,
+  type: 'bank' | 'btc',
+  data: BankWithdrawalFormSchema | BTCWithdrawalFormSchema
+) {
+  // In a real app, this would create a 'pending' withdrawal transaction
+  // and likely trigger an admin notification.
+  // For this demo, we'll just log it.
+  console.log(`Withdrawal request for user ${userId}, type: ${type}, data:`, data);
+  return { success: true };
 }
