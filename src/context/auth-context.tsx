@@ -13,12 +13,14 @@ type AuthContextType = {
   user: User | null;
   appUser: AppUser | null;
   loading: boolean;
+  updateAppUser: (user: AppUser) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   appUser: null,
   loading: true,
+  updateAppUser: () => {},
 });
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
@@ -40,8 +42,12 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  const updateAppUser = (newUser: AppUser) => {
+    setAppUser(newUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, appUser, loading }}>
+    <AuthContext.Provider value={{ user, appUser, loading, updateAppUser }}>
       {children}
     </AuthContext.Provider>
   );

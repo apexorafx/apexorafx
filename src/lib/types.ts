@@ -60,3 +60,13 @@ export interface DashboardData {
   activeCopyTrades: number;
   recentTransactions: Transaction[];
 }
+
+export const UpdateProfileSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters").max(100).optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").max(100).optional(),
+  username: z.string().min(3, "Username must be at least 3 characters").max(20).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores.").optional(),
+  phoneNumber: z.string().max(50).optional(),
+  countryCode: z.string().length(2, "Invalid country code").optional(),
+});
+
+export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>;

@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -192,4 +192,68 @@ export async function getUserByFirebaseUid(firebaseUid: string): Promise<AppUser
     } finally {
         client.release();
     }
+}
+
+const mapToDbColumn = (fieldName: keyof UpdateProfileFormValues): string | null => {
+  const mapping: Record<keyof UpdateProfileFormValues, string> = {
+    firstName: 'first_name',
+    lastName: 'last_name',
+    username: 'username',
+    phoneNumber: 'phone_number',
+    countryCode: 'country_code',
+  };
+  return mapping[fieldName] || null;
+}
+
+export async function updateUserProfile(firebaseUid: string, data: UpdateProfileFormValues) {
+  const parsed = UpdateProfileSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return { success: false, message: "Invalid form data.", errors: parsed.error.flatten() };
+  }
+
+  const client = await db.getClient();
+  try {
+    const fieldsToUpdate = Object.entries(parsed.data).filter(([, value]) => value !== undefined);
+
+    if (fieldsToUpdate.length === 0) {
+      return { success: true, message: 'No changes were made.', user: null };
+    }
+
+    const setClauses = fieldsToUpdate.map(([key], index) => {
+        const dbColumn = mapToDbColumn(key as keyof UpdateProfileFormValues);
+        if (!dbColumn) throw new Error(`Invalid field name: ${key}`);
+        return `${dbColumn} = $${index + 1}`;
+    }).join(', ');
+    
+    const values = fieldsToUpdate.map(([, value]) => value);
+
+    const query = `
+      UPDATE users
+      SET ${setClauses}
+      WHERE firebase_auth_uid = $${values.length + 1}
+      RETURNING *;
+    `;
+    
+    values.push(firebaseUid);
+    
+    const result = await client.query(query, values);
+
+    if (result.rows.length > 0) {
+      return { success: true, user: result.rows[0] as AppUser };
+    } else {
+      return { success: false, message: 'User not found or no update was made.' };
+    }
+
+  } catch (error) {
+    console.error('Database error updating user profile:', error);
+     if (error instanceof Error && (error as any).code === '23505') {
+        if (error.message.includes('users_username_key')) {
+            return { success: false, message: 'This username is already taken.' };
+        }
+    }
+    return { success: false, message: 'An internal error occurred. Please try again.' };
+  } finally {
+    client.release();
+  }
 }
