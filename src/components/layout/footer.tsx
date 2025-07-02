@@ -26,10 +26,9 @@ const sections = [
   {
     title: "Company",
     links: [
-      { label: "About Us", href: "#" },
+      { label: "About Us", href: "/about" },
       { label: "Pricing", href: "/pricing" },
       { label: "Contact Us", href: "/contact" },
-      { label: "Customer Feedback", href: "#" },
     ],
   },
   {

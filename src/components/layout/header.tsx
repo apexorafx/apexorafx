@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/ai-insights", label: "AI Insights" },
   { href: "/resources", label: "Resources" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
 ];
 
