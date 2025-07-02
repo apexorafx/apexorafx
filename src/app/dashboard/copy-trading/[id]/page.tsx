@@ -154,7 +154,7 @@ export default function TraderProfilePage() {
             alt={`${trader.username}'s Profile Banner`} 
             fill 
             className="object-cover"
-            data-ai-hint="trading lifestyle"
+            data-ai-hint="abstract shape"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-6 flex items-end">
             <div className="flex items-center gap-4">

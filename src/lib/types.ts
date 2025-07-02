@@ -103,3 +103,10 @@ export const SetupPinSchema = z.object({
 });
 
 export type SetupPinFormValues = z.infer<typeof SetupPinSchema>;
+
+export const DepositFormSchema = z.object({
+  crypto: z.string().min(1, "Please select a cryptocurrency."),
+  amountUSD: z.coerce.number().min(1, "Amount must be at least $1."),
+});
+
+export type DepositFormValues = z.infer<typeof DepositFormSchema>;

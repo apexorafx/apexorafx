@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema, type DepositFormValues, DepositFormSchema } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -126,13 +126,13 @@ export async function getImageByContextTag(tag: string): Promise<{ imageUrl: str
     const result = await client.query(query, [tag]);
     if (result.rows.length > 0) {
       const imageUrl = result.rows[0].image_url;
-      // Filter out URLs from the old, contaminated domain to prevent crashes.
+      // This is the critical filter to prevent contaminated data from being used.
       if (imageUrl && imageUrl.includes('yosjqhioxjfywkdaaflv.supabase.co')) {
-        console.warn(`[Data Contamination] Filtered out an image from an old domain for tag: ${tag}`);
+        console.warn(`Filtered out contaminated image URL for tag: ${tag}`);
         return null;
       }
       return {
-        imageUrl: result.rows[0].image_url,
+        imageUrl,
         altText: result.rows[0].alt_text || 'Apexora promotional image',
       };
     }
@@ -414,6 +414,61 @@ export async function completePinSetup(firebaseUid: string, pin: string) {
   } catch (error) {
     console.error('Database error completing PIN setup:', error);
     return { success: false, message: 'An internal server error occurred.' };
+  } finally {
+    client.release();
+  }
+}
+
+export async function checkIfFirstDeposit(userId: string): Promise<boolean> {
+  if (!userId) {
+    return false;
+  }
+  const client = await db.getClient();
+  try {
+    const query = `
+      SELECT 1 FROM transactions
+      WHERE user_id = $1 AND transaction_type = 'deposit' AND status = 'completed'
+      LIMIT 1;
+    `;
+    const result = await client.query(query, [userId]);
+    return result.rows.length === 0;
+  } catch (error) {
+    console.error('Database error checking for first deposit:', error);
+    return false;
+  } finally {
+    client.release();
+  }
+}
+
+export async function createDepositTransaction(data: { userId: string; amountUSD: number; crypto: string }) {
+  const schema = z.object({
+    userId: z.string(),
+    amountUSD: z.number().positive(),
+    crypto: z.string().min(1),
+  });
+
+  const parsed = schema.safeParse(data);
+  if (!parsed.success) {
+    return { success: false, message: "Invalid deposit data." };
+  }
+
+  const { userId, amountUSD } = parsed.data;
+
+  const client = await db.getClient();
+  try {
+    const query = `
+      INSERT INTO transactions (user_id, transaction_type, amount_usd_equivalent, status)
+      VALUES ($1, 'deposit', $2, 'pending')
+      RETURNING id;
+    `;
+    const result = await client.query(query, [userId, amountUSD]);
+    if (result.rows.length > 0) {
+      return { success: true, transactionId: result.rows[0].id };
+    }
+    return { success: false, message: 'Failed to create transaction.' };
+  } catch (error) {
+    console.error('Database error creating deposit transaction:', error);
+    return { success: false, message: 'An internal error occurred.' };
   } finally {
     client.release();
   }
