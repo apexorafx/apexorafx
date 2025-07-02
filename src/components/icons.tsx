@@ -12,9 +12,8 @@ export function ApexoraLogo(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 17l10 5 10-5" />
-      <path d="M2 12l10 5 10-5" />
+      <path d="M12 2L2 22h20L12 2Z" />
+      <path d="M7 15h10" />
     </svg>
   );
 }
