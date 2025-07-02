@@ -3,6 +3,9 @@
 import { z } from 'zod';
 import { ContactFormSchema, type ContactFormValues } from './types';
 import { db } from './db';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function submitContactForm(values: ContactFormValues) {
     const parsed = ContactFormSchema.safeParse(values);
@@ -11,11 +14,40 @@ export async function submitContactForm(values: ContactFormValues) {
         return { success: false, message: "Invalid form data." };
     }
 
-    console.log('Contact form submitted:', parsed.data);
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return { success: true, message: "Message sent successfully!" };
+    const { name, email, subject, message } = parsed.data;
+
+    try {
+        const { data, error } = await resend.emails.send({
+            from: 'Apexora Contact Form <onboarding@resend.dev>',
+            to: ['support@apexora.com'],
+            subject: `New Contact Form Submission: ${subject}`,
+            reply_to: email,
+            html: `
+              <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <h2 style="color: #3B82F6;">New Message from Apexora Contact Form</h2>
+                <p>You have received a new message from your website's contact form.</p>
+                <hr>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                <p><strong>Subject:</strong> ${subject}</p>
+                <hr>
+                <p><strong>Message:</strong></p>
+                <p>${message.replace(/\n/g, '<br>')}</p>
+              </div>
+            `,
+        });
+
+        if (error) {
+            console.error('Resend error:', error);
+            return { success: false, message: "Failed to send the message. Please try again later." };
+        }
+
+        return { success: true, message: "Message sent successfully!" };
+
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return { success: false, message: "An internal error occurred. Please try again." };
+    }
 }
 
 
