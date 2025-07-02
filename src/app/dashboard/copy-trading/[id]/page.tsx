@@ -13,7 +13,51 @@ import { mockTraders } from '@/lib/traders';
 import { useAuth } from '@/context/auth-context';
 import { getCopiedTraderIds, copyTrader, stopCopyingTrader } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+} from "recharts"
+
+const chartConfig = {
+  performance: {
+    label: "Performance",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig;
+
+const generatePerformanceData = (profitStr: string) => {
+    const profit = parseFloat(profitStr.replace('%', ''));
+    const data = [];
+    let value = 10000; // Starting portfolio value
+    const days = 90;
+    const dailyFluctuation = (Math.abs(profit) / days) / 100;
+
+    for (let i = 0; i < days; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - (days - i));
+        
+        const randomFactor = (Math.random() - 0.45); // slight positive bias
+        const change = value * dailyFluctuation * (profit > 0 ? 1 : -1) * (1 + randomFactor);
+        value += change;
+        
+        data.push({
+            date: date.toISOString().split('T')[0],
+            performance: Math.max(0, value), // Ensure value doesn't go below 0
+        });
+    }
+    return data;
+};
 
 export default function TraderProfilePage() {
   const params = useParams();
@@ -27,6 +71,13 @@ export default function TraderProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState(false);
+
+  const performanceData = useMemo(() => {
+    if (trader) {
+      return generatePerformanceData(trader.profit);
+    }
+    return [];
+  }, [trader]);
 
   useEffect(() => {
     async function fetchInitialStatus() {
@@ -46,7 +97,6 @@ export default function TraderProfilePage() {
   }, [appUser, trader, toast]);
 
   if (!trader) {
-    // In a real app, you might show a loading state first, then a not found state
     return (
       <div className="flex flex-col items-center justify-center h-full p-8">
         <UserCircle className="w-24 h-24 text-muted-foreground mb-4" />
@@ -133,20 +183,25 @@ export default function TraderProfilePage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl flex items-center"><TrendingUp className="mr-2 h-5 w-5"/> Performance</CardTitle>
+                <CardTitle className="text-xl flex items-center"><TrendingUp className="mr-2 h-5 w-5"/> Performance (90-day)</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-muted/30 rounded-md flex items-center justify-center">
-                    <Image 
-                        src="https://placehold.co/600x300.png"
-                        alt={`${trader.username} Performance Chart`} 
-                        width={600} 
-                        height={300} 
-                        data-ai-hint="performance graph"
-                        className="opacity-60 rounded-md"
-                    />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2 text-center">Detailed performance chart coming soon.</p>
+                <ChartContainer config={chartConfig} className="aspect-video h-[250px] w-full">
+                  <LineChart accessibilityLayer data={performanceData} margin={{ left: 12, right: 12, top: 5, bottom: 5, }}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                      <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={6} domain={['auto', 'auto']} tickFormatter={(value) => `$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`} />
+                    <RechartsTooltip cursor={false} content={<ChartTooltipContent indicator="line" labelFormatter={(label, payload) => {
+                      return new Date(payload[0]?.payload.date).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    }} formatter={(value) => `$${Number(value).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`} hideLabel />} />
+                    <Line dataKey="performance" type="monotone" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Portfolio Value" />
+                  </LineChart>
+                </ChartContainer>
               </CardContent>
             </Card>
           </div>

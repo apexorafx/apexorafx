@@ -23,7 +23,10 @@ const values = [
 ];
 
 export default async function AboutPage() {
-  const storyImage = await getImageByContextTag('about_page_generic_promo');
+  const [storyImage, securityImage] = await Promise.all([
+    getImageByContextTag('about_page_generic_promo'),
+    getImageByContextTag('about_page_security_promo'),
+  ]);
 
   return (
     <div className="bg-background">
@@ -115,8 +118,8 @@ export default async function AboutPage() {
                 </div>
                 <div className="mt-8 md:mt-0">
                     <Image
-                        src="https://placehold.co/600x400.png"
-                        alt="Security concept"
+                        src={securityImage?.imageUrl || "https://placehold.co/600x400.png"}
+                        alt={securityImage?.altText || "Security concept"}
                         data-ai-hint="security shield"
                         width={600}
                         height={400}

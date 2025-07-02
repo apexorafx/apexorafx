@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { LineChart as LineChartIcon, Star, Search, Loader2, Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -25,7 +25,6 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts"
 import { getMarketData, getMarketTabs } from '@/lib/data';
-import Image from 'next/image';
 
 interface Asset {
   id: string;
@@ -40,15 +39,22 @@ interface Asset {
   category: string;
 }
 
-const eurUsdHistoricalData = [
-  { date: '2024-05-01', price: 1.0850 },
-  { date: '2024-05-02', price: 1.0865 },
-  { date: '2024-05-03', price: 1.0830 },
-  { date: '2024-05-04', price: 1.0880 },
-  { date: '2024-05-05', price: 1.0875 },
-  { date: '2024-05-06', price: 1.0900 },
-  { date: '2024-05-07', price: 1.0890 },
-];
+const generateHistoricalData = (basePrice: number) => {
+    const data = [];
+    let price = basePrice;
+    const days = 30;
+    for (let i = 0; i < days; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - (days - i));
+        const fluctuation = (Math.random() - 0.5) * 0.05; // -2.5% to +2.5% daily change
+        price = price * (1 + fluctuation);
+        data.push({
+            date: date.toISOString().split('T')[0],
+            price: price,
+        });
+    }
+    return data;
+}
 
 const chartConfig = {
   price: {
@@ -63,6 +69,7 @@ export default function MarketsDashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('forex');
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [historicalData, setHistoricalData] = useState<any[]>([]);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,9 +89,9 @@ export default function MarketsDashboardPage() {
           change: asset.change,
           changePercent: asset.changePercent,
           isUp: asset.isUp,
-          high: price * 1.015, // Mock data: 1.5% higher than current price
-          low: price * 0.985,  // Mock data: 1.5% lower than current price
-          favorite: false, // Default to not favorite
+          high: price * 1.015,
+          low: price * 0.985,
+          favorite: false,
           category,
         };
       });
@@ -92,9 +99,14 @@ export default function MarketsDashboardPage() {
 
     setAssets(processedAssets);
     if (processedAssets.forex && processedAssets.forex.length > 0) {
-      setSelectedAsset(processedAssets.forex[0]);
+      handleViewAsset(processedAssets.forex[0]);
     }
     setIsLoading(false);
+  }, []);
+
+  const handleViewAsset = useCallback((asset: Asset) => {
+    setSelectedAsset(asset);
+    setHistoricalData(generateHistoricalData(asset.price));
   }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,10 +130,6 @@ export default function MarketsDashboardPage() {
             description: `${asset.name} has been ${asset.favorite ? 'removed from' : 'added to'} your favorites.`,
         });
     }
-  };
-  
-  const handleViewAsset = (asset: Asset) => {
-    setSelectedAsset(asset);
   };
   
   const filteredAssets = useMemo(() => {
@@ -235,34 +243,22 @@ export default function MarketsDashboardPage() {
               {selectedAsset ? `${selectedAsset.name} Details` : 'Asset Details'}
             </CardTitle>
             <CardDescription>
-              {selectedAsset ? `Data for ${selectedAsset.id}` : 'Select an asset to view its chart and details.'}
+              {selectedAsset ? `30-day price movement for ${selectedAsset.id}` : 'Select an asset to view its chart and details.'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {selectedAsset ? (
               <div className="space-y-4">
-                {selectedAsset.id === 'EUR/USD' ? (
-                   <ChartContainer config={chartConfig} className="aspect-video h-[250px] w-full">
-                    <LineChart accessibilityLayer data={eurUsdHistoricalData} margin={{ left: 12, right: 12, top: 5, bottom: 5, }}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                      <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                       <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={6} domain={['auto', 'auto']} tickFormatter={(value) => `$${Number(value).toFixed(4)}`} />
-                      <RechartsTooltip cursor={false} content={<ChartTooltipContent indicator="line" hideLabel />} />
-                      <Line dataKey="price" type="monotone" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Price" />
-                    </LineChart>
-                  </ChartContainer>
-                ) : (
-                  <div className="aspect-video bg-muted/30 rounded-md flex items-center justify-center">
-                    <Image 
-                      src={`https://placehold.co/600x300.png`} 
-                      alt={`${selectedAsset.name} Chart`}
-                      data-ai-hint="market chart graph"
-                      width={600} 
-                      height={300}
-                      className="opacity-70 rounded-md" 
-                    />
-                  </div>
-                )}
+                 <ChartContainer config={chartConfig} className="aspect-video h-[250px] w-full">
+                  <LineChart accessibilityLayer data={historicalData} margin={{ left: 12, right: 12, top: 5, bottom: 5, }}>
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                     <YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={6} domain={['auto', 'auto']} tickFormatter={(value) => `$${Number(value).toFixed(selectedAsset.id.toUpperCase().includes('JPY') ? 2 : 4)}`} />
+                    <RechartsTooltip cursor={false} content={<ChartTooltipContent indicator="line" hideLabel />} />
+                    <Line dataKey="price" type="monotone" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} name="Price" />
+                  </LineChart>
+                </ChartContainer>
+
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <p className="text-muted-foreground">Price</p>

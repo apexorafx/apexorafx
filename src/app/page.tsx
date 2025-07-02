@@ -41,22 +41,19 @@ const testimonials = [
   {
     name: "Alex Johnson",
     title: "Seasoned Trader",
-    avatar: "https://placehold.co/100x100.png",
-    dataAiHint: "man portrait",
+    avatarSeed: "Alex",
     text: "Apexora's platform is incredibly intuitive and their AI insights have given me a tangible edge in the market. Support is always responsive and helpful.",
   },
   {
     name: "Samantha Lee",
     title: "New Investor",
-    avatar: "https://placehold.co/100x100.png",
-    dataAiHint: "woman portrait",
+    avatarSeed: "Samantha",
     text: "As someone new to trading, the educational resources were a lifesaver. I felt confident making my first trades, and the low spreads are a huge plus.",
   },
   {
     name: "Michael Chen",
     title: "Crypto Enthusiast",
-    avatar: "https://placehold.co/100x100.png",
-    dataAiHint: "man glasses",
+    avatarSeed: "Michael",
     text: "The variety of digital currencies available is fantastic. Fast execution and a clean interface make Apexora my go-to for crypto trading.",
   },
 ];
@@ -164,7 +161,7 @@ export default async function Home() {
               <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader. <Link href="/pricing" className="text-primary hover:underline">View all plans</Link>.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-              {tradingPlans.map((plan) => (
+              {tradingPlans.filter(p => p.id <= 3).map((plan) => (
                 <Card key={plan.id} className={cn(
                   "flex flex-col h-full",
                   plan.isPopular ? "border-primary shadow-2xl scale-105" : "hover:shadow-xl transition-shadow"
@@ -216,7 +213,7 @@ export default async function Home() {
                   </CardContent>
                   <CardHeader className="flex-row items-center gap-4 pt-4">
                     <Avatar>
-                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint={testimonial.dataAiHint} />
+                      <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${testimonial.avatarSeed}`} alt={testimonial.name} />
                       <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
