@@ -56,6 +56,18 @@ const testimonials = [
     avatarSeed: "Michael",
     text: "The variety of digital currencies available is fantastic. Fast execution and a clean interface make Apexora my go-to for crypto trading.",
   },
+  {
+    name: "David Rodriguez",
+    title: "Day Trader",
+    avatarSeed: "David",
+    text: "Execution speed is critical for my strategy, and Apexora delivers. The platform is stable and fast, which is exactly what I need for day trading.",
+  },
+  {
+    name: "Jessica Williams",
+    title: "Mobile-First User",
+    avatarSeed: "Jessica",
+    text: "I do most of my trading on the go, and the mobile experience is seamless. It's powerful enough to do proper analysis but simple enough to use anywhere.",
+  },
 ];
 
 const markets = [
@@ -264,7 +276,7 @@ export default async function Home() {
                   </CardContent>
                   <CardHeader className="flex-row items-center gap-4 pt-4">
                     <Avatar>
-                      <AvatarImage src={`https://api.dicebear.com/8.x/initials/svg?seed=${testimonial.avatarSeed}`} alt={testimonial.name} />
+                      <AvatarImage src={`https://api.dicebear.com/8.x/avataaars/svg?seed=${testimonial.avatarSeed}`} alt={testimonial.name} />
                       <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
