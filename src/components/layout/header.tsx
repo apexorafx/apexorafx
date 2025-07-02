@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Mountain } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ApexoraLogo } from "@/components/icons";
 import { useAuth } from "@/context/auth-context";
 import { auth } from "@/lib/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeToggle } from "./theme-toggle";
 
 const navLinks = [
   { href: "/markets", label: "Markets" },
@@ -88,6 +89,7 @@ export function Header() {
           </SheetContent>
         </Sheet>
         <div className="flex flex-1 items-center justify-end space-x-2">
+          <ThemeToggle />
           {loading ? (
              <div className="flex items-center gap-2">
                 <Skeleton className="h-9 w-20" />
