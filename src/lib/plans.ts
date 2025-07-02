@@ -3,7 +3,7 @@ export const tradingPlans = [
   {
     id: 1,
     name: 'Beginner',
-    description: 'For those new to the world of trading.',
+    description: 'Basic plan for new traders.',
     price: 'Spreads from 1.0 pips',
     priceDescription: 'Min. Deposit: $500',
     features: [
@@ -48,7 +48,7 @@ export const tradingPlans = [
   {
     id: 4,
     name: 'Pro',
-    description: 'For experienced traders who demand the best.',
+    description: 'Advanced features for professional traders.',
     price: 'Raw Spreads from 0.0 pips',
     priceDescription: 'Min. Deposit: $10,000',
     features: [
@@ -64,7 +64,7 @@ export const tradingPlans = [
     id: 5,
     name: 'Corporate',
     description: 'Tailored for corporate clients and institutions.',
-    price: 'Contact Us for Pricing',
+    price: 'Contact Us',
     priceDescription: 'Min. Deposit: $50,000',
     features: [
         'All Pro features',

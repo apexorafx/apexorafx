@@ -1,7 +1,12 @@
+
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Info } from "lucide-react";
+import { tradingPlans } from "@/lib/plans";
+import { cn } from "@/lib/utils";
+import { Check, Info } from "lucide-react";
+import Link from "next/link";
 
 type PricingData = {
   instrument: string;
@@ -27,41 +32,54 @@ export default function PricingPage() {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold font-headline tracking-tight text-foreground">
-          Transparent Pricing
+          Transparent Pricing & Plans
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-          Competitive spreads, clear swap rates, and extensive trading hours. No hidden fees.
+          Choose the account that's right for you. Competitive spreads, clear swap rates, and no hidden fees.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Raw Spreads</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">Get access to institutional-grade pricing with spreads starting from as low as 0.0 pips on major currency pairs.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Low Commission</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">Enjoy some of the lowest commission rates in the industry, maximizing your potential returns on every trade.</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">No Hidden Fees</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">We believe in transparency. What you see is what you get, with no deposit, withdrawal, or inactivity fees.</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Account Plans Section */}
+      <section className="py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+          {tradingPlans.map((plan) => (
+            <Card key={plan.id} className={cn(
+              "flex flex-col",
+              plan.isPopular ? "border-2 border-primary shadow-2xl" : ""
+            )}>
+              {plan.isPopular && (
+                <Badge className="w-fit self-center -mt-3">Most Popular</Badge>
+              )}
+              <CardHeader className="text-center">
+                <CardTitle className="font-headline text-2xl">{plan.name}</CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow flex flex-col">
+                <div className="text-center mb-6">
+                  <p className="text-4xl font-bold">{plan.price}</p>
+                  <p className="text-muted-foreground mt-1">{plan.priceDescription}</p>
+                </div>
+                <ul className="space-y-4 flex-grow">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <Check className="w-5 h-5 text-financial-green mr-3 flex-shrink-0 mt-1" />
+                      <span className="text-muted-foreground">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button asChild className="w-full font-bold" variant={plan.isPopular ? "default" : "outline"}>
+                  <Link href="/signup">{plan.buttonText}</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-      <Card className="mt-12">
+      {/* Trading Conditions Section */}
+      <Card>
         <CardHeader>
           <CardTitle className="font-headline">Trading Conditions</CardTitle>
           <CardDescription>

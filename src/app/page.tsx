@@ -161,7 +161,7 @@ export default async function Home() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Find the Right Plan for You</h2>
-              <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader.</p>
+              <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader. <Link href="/pricing" className="text-primary hover:underline">View all plans</Link>.</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
               {tradingPlans.filter(p => [1,3,4].includes(p.id)).map((plan) => (
@@ -178,8 +178,8 @@ export default async function Home() {
                   </CardHeader>
                   <CardContent className="flex-grow flex flex-col">
                     <div className="text-center mb-6">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      <span className="text-muted-foreground">{plan.priceDescription}</span>
+                      <p className="text-4xl font-bold">{plan.price}</p>
+                      <p className="text-muted-foreground mt-1">{plan.priceDescription}</p>
                     </div>
                     <ul className="space-y-4 flex-grow">
                       {plan.features.map((feature, index) => (
