@@ -257,3 +257,54 @@ export async function updateUserProfile(firebaseUid: string, data: UpdateProfile
     client.release();
   }
 }
+
+// Copy Trading Actions
+
+export async function getCopiedTraderIds(userId: string): Promise<string[]> {
+  if (!userId) return [];
+  const client = await db.getClient();
+  try {
+    const query = 'SELECT trader_id FROM user_copied_traders WHERE user_id = $1';
+    const result = await client.query(query, [userId]);
+    return result.rows.map(row => row.trader_id);
+  } catch (error) {
+    console.error('Database error fetching copied traders:', error);
+    throw new Error('Could not fetch copied traders.');
+  } finally {
+    client.release();
+  }
+}
+
+export async function copyTrader(userId: string, traderId: string) {
+  if (!userId || !traderId) {
+    throw new Error('User ID and Trader ID are required.');
+  }
+  const client = await db.getClient();
+  try {
+    const query = 'INSERT INTO user_copied_traders (user_id, trader_id) VALUES ($1, $2)';
+    await client.query(query, [userId, traderId]);
+    return { success: true };
+  } catch (error) {
+    console.error('Database error copying trader:', error);
+    throw new Error('Could not copy trader.');
+  } finally {
+    client.release();
+  }
+}
+
+export async function stopCopyingTrader(userId: string, traderId: string) {
+  if (!userId || !traderId) {
+    throw new Error('User ID and Trader ID are required.');
+  }
+  const client = await db.getClient();
+  try {
+    const query = 'DELETE FROM user_copied_traders WHERE user_id = $1 AND trader_id = $2';
+    await client.query(query, [userId, traderId]);
+    return { success: true };
+  } catch (error) {
+    console.error('Database error stopping copy trade:', error);
+    throw new Error('Could not stop copying trader.');
+  } finally {
+    client.release();
+  }
+}

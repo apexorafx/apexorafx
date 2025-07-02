@@ -70,3 +70,16 @@ export const UpdateProfileSchema = z.object({
 });
 
 export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>;
+
+export interface Trader {
+  id: string;
+  username: string;
+  market: string;
+  risk: 'Low' | 'Medium' | 'High';
+  profit: string;
+  copiers: number;
+  image: string;
+  avatarSeed: string;
+  joined: string;
+  strategy: string;
+}
