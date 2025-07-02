@@ -110,3 +110,27 @@ export const DepositFormSchema = z.object({
 });
 
 export type DepositFormValues = z.infer<typeof DepositFormSchema>;
+
+// Bank Withdrawal
+export const BankWithdrawalFormSchema = z.object({
+  amountUSD: z.coerce.number().min(50, { message: "Minimum withdrawal is $50." }),
+  bankName: z.string().min(2, { message: "Bank name is required." }),
+  accountHolderName: z.string().min(2, { message: "Account holder name is required." }),
+  accountNumber: z.string().min(1, { message: "Account number is required." }),
+  swiftBic: z.string().optional(),
+  bankCountry: z.string().length(2, { message: "Bank country is required." }),
+  iban: z.string().optional(),
+  sortCode: z.string().optional(),
+  routingNumber: z.string().optional(),
+  notes: z.string().optional(),
+});
+export type BankWithdrawalFormValues = z.infer<typeof BankWithdrawalFormSchema>;
+
+
+// BTC Withdrawal
+export const BTCWithdrawalFormSchema = z.object({
+  amountUSD: z.coerce.number().min(20, { message: "Minimum withdrawal is $20." }),
+  btcAddress: z.string().min(26, { message: "Please enter a valid BTC address." }), // Basic validation for length
+  notes: z.string().optional(),
+});
+export type BTCWithdrawalFormValues = z.infer<typeof BTCWithdrawalFormSchema>;
