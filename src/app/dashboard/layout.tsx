@@ -17,6 +17,7 @@ export default function DashboardLayout({
   const router = useRouter();
 
   const profileIsComplete = !!appUser?.profile_completed_at;
+  const pinIsComplete = !!appUser?.pin_setup_completed_at;
 
   useEffect(() => {
     if (loading) {
@@ -28,11 +29,14 @@ export default function DashboardLayout({
     } else if (!profileIsComplete) {
         // Logged in, but profile is not complete
         router.push('/signup-details');
+    } else if (!pinIsComplete) {
+        // Profile is complete, but PIN is not set up
+        router.push('/setup-pin');
     }
-  }, [appUser, loading, router, profileIsComplete]);
+  }, [appUser, loading, router, profileIsComplete, pinIsComplete]);
 
   // Show loader while waiting for auth or if user needs redirection
-  if (loading || !appUser || !profileIsComplete) {
+  if (loading || !appUser || !profileIsComplete || !pinIsComplete) {
     return (
        <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
