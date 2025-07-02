@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -14,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
-import { createUserInDb } from '@/lib/actions';
+import { createUserInDb, checkUsernameExists } from '@/lib/actions';
 
 const formSchema = z.object({
   username: z.string().min(3, { message: 'Username must be at least 3 characters.' }).max(20, { message: 'Username must be 20 characters or less.'}).regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores.'),
@@ -44,8 +45,21 @@ export default function SignupPage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      // Step 1: Check if username is already taken to fail fast.
+      const usernameCheck = await checkUsernameExists(values.username);
+      if (usernameCheck.exists) {
+        form.setError("username", {
+          type: "manual",
+          message: "This username is already taken. Please choose another.",
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Step 2: Create the user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       
+      // Step 3: Create the user in the database
       const dbUserResult = await createUserInDb({
           firebaseUid: userCredential.user.uid,
           email: values.email,
@@ -53,12 +67,22 @@ export default function SignupPage() {
       });
 
       if (!dbUserResult.success) {
+        // If DB creation fails, delete the Firebase user to keep systems in sync.
         await userCredential.user.delete();
-        toast({
-            variant: "destructive",
-            title: "Sign Up Failed",
-            description: dbUserResult.message || "Could not create user profile. Please try again.",
-        });
+        
+        // Prioritize showing the error on a specific field if possible
+        if (dbUserResult.message?.includes('username')) {
+            form.setError("username", { type: "manual", message: dbUserResult.message });
+        } else if (dbUserResult.message?.includes('email')) {
+             form.setError("email", { type: "manual", message: dbUserResult.message });
+        } else {
+            // Fallback to a generic toast if the error is not specific
+            toast({
+                variant: "destructive",
+                title: "Sign Up Failed",
+                description: dbUserResult.message || "Could not create user profile. Please try again.",
+            });
+        }
         setLoading(false);
         return;
       }
@@ -66,15 +90,18 @@ export default function SignupPage() {
       router.push('/signup-details');
     } catch (error: any) {
       console.error('Signup failed', error);
-      let description = 'An unexpected error occurred. Please try again.';
+
+      // Handle Firebase-specific errors
       if (error.code === 'auth/email-already-in-use') {
-        description = 'This email address is already in use by another account.';
+        form.setError("email", { type: "manual", message: "This email is already in use by another account." });
+      } else {
+        // Handle other unexpected errors
+        toast({
+          variant: 'destructive',
+          title: 'Sign Up Failed',
+          description: 'An unexpected error occurred. Please try again.',
+        });
       }
-      toast({
-        variant: 'destructive',
-        title: 'Sign Up Failed',
-        description,
-      });
     } finally {
       setLoading(false);
     }

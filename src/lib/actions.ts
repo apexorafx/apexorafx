@@ -95,6 +95,23 @@ export async function createUserInDb(data: { firebaseUid: string; email: string;
   }
 }
 
+export async function checkUsernameExists(username: string) {
+    const client = await db.getClient();
+    try {
+        const query = 'SELECT 1 FROM users WHERE username = $1';
+        const result = await client.query(query, [username.toLowerCase()]);
+        return { exists: result.rows.length > 0 };
+    } catch (error) {
+        console.error('Database error checking username:', error);
+        // In case of a db error, it's safer to prevent signup by returning true
+        // and providing an error message for the client to display.
+        return { exists: true, error: "Could not verify username. Please try again." };
+    } finally {
+        client.release();
+    }
+}
+
+
 export async function getImageByContextTag(tag: string): Promise<{ imageUrl: string; altText: string } | null> {
   const client = await db.getClient();
   try {
