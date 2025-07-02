@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { getImageByContextTag } from "@/lib/actions";
 import { tradingPlans } from "@/lib/plans";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Bot, BookOpen, Check, LineChart, ShieldCheck } from "lucide-react";
+import { ArrowRight, Bot, BookOpen, Check, LineChart, ShieldCheck, Globe, Landmark, Coins, Wheat, BarChartHorizontal, UserPlus, DollarSign, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -56,6 +56,32 @@ const testimonials = [
     avatarSeed: "Michael",
     text: "The variety of digital currencies available is fantastic. Fast execution and a clean interface make Apexora my go-to for crypto trading.",
   },
+];
+
+const markets = [
+    { name: "Forex", icon: <Globe className="w-10 h-10 text-primary"/> },
+    { name: "Stocks", icon: <Landmark className="w-10 h-10 text-primary"/> },
+    { name: "Crypto", icon: <Coins className="w-10 h-10 text-primary"/> },
+    { name: "Commodities", icon: <Wheat className="w-10 h-10 text-primary"/> },
+    { name: "Indices", icon: <BarChartHorizontal className="w-10 h-10 text-primary"/> },
+];
+
+const getStartedSteps = [
+    {
+        icon: <UserPlus className="w-10 h-10 text-primary" />,
+        title: "1. Create Account",
+        description: "Complete our quick and secure registration form to get started in minutes.",
+    },
+    {
+        icon: <DollarSign className="w-10 h-10 text-primary" />,
+        title: "2. Fund Your Account",
+        description: "Choose from various secure deposit methods to fund your trading account.",
+    },
+    {
+        icon: <TrendingUp className="w-10 h-10 text-primary" />,
+        title: "3. Start Trading",
+        description: "Access the global markets, utilize our tools, and begin your trading journey.",
+    },
 ];
 
 export default async function Home() {
@@ -114,8 +140,33 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Visual Section */}
+        {/* Markets Section */}
         <section className="py-16 md:py-24 bg-secondary/50">
+            <div className="container mx-auto px-4">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold font-headline">A World of Markets at Your Fingertips</h2>
+                    <p className="mt-4 text-lg text-muted-foreground">Trade on a wide range of instruments with competitive conditions.</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                    {markets.map(market => (
+                        <div key={market.name} className="flex flex-col items-center gap-4 text-center">
+                            <div className="bg-background p-5 rounded-full shadow-md">
+                                {market.icon}
+                            </div>
+                            <h3 className="text-xl font-semibold">{market.name}</h3>
+                        </div>
+                    ))}
+                </div>
+                 <div className="text-center mt-12">
+                    <Button asChild size="lg" variant="outline">
+                        <Link href="/markets">Explore All Instruments</Link>
+                    </Button>
+                </div>
+            </div>
+        </section>
+
+        {/* Visual Section */}
+        <section className="py-16 md:py-24 bg-background">
             <div className="container mx-auto px-4">
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                     <div>
@@ -154,14 +205,14 @@ export default async function Home() {
         </section>
 
         {/* Trading Plans Section */}
-        <section className="py-16 md:py-24 bg-background">
+        <section className="py-16 md:py-24 bg-secondary/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Find the Right Plan for You</h2>
               <p className="mt-4 text-lg text-muted-foreground">Transparent pricing for every level of trader. <Link href="/pricing" className="text-primary hover:underline">View all plans</Link>.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-              {tradingPlans.filter(p => p.id <= 3).map((plan) => (
+              {tradingPlans.map((plan) => (
                 <Card key={plan.id} className={cn(
                   "flex flex-col h-full",
                   plan.isPopular ? "border-primary shadow-2xl scale-105" : "hover:shadow-xl transition-shadow"
@@ -189,7 +240,7 @@ export default async function Home() {
                   </CardContent>
                   <CardFooter>
                     <Button asChild className="w-full font-bold" variant={plan.isPopular ? "default" : "outline"}>
-                      <Link href="/signup">{plan.buttonText}</Link>
+                      <Link href={plan.name.toLowerCase().includes('contact') ? '/contact' : '/signup'}>{plan.buttonText}</Link>
                     </Button>
                   </CardFooter>
                 </Card>
@@ -199,7 +250,7 @@ export default async function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 md:py-24 bg-secondary/50">
+        <section className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Trusted by Traders Worldwide</h2>
@@ -225,6 +276,27 @@ export default async function Home() {
               ))}
             </div>
           </div>
+        </section>
+        
+        {/* Get Started Section */}
+        <section className="py-16 md:py-24 bg-secondary/50">
+            <div className="container mx-auto px-4">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl md:text-4xl font-bold font-headline">Get Started in 3 Simple Steps</h2>
+                    <p className="mt-4 text-lg text-muted-foreground">Begin your journey to the financial markets today.</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    {getStartedSteps.map((step) => (
+                        <div key={step.title} className="flex flex-col items-center">
+                            <div className="bg-primary/10 p-5 rounded-full mb-4">
+                                {step.icon}
+                            </div>
+                            <h3 className="text-2xl font-bold font-headline mb-2">{step.title}</h3>
+                            <p className="text-muted-foreground max-w-xs">{step.description}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </section>
 
         {/* CTA Section */}
