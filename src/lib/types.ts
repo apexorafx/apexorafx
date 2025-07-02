@@ -42,3 +42,19 @@ export interface AppUser {
   updated_at: Date;
   admin_pin?: string | null;
 }
+
+export interface Transaction {
+  id: string;
+  transaction_type: string;
+  amount_usd_equivalent: string;
+  status: string;
+  processed_at: Date;
+}
+
+export interface DashboardData {
+  username: string;
+  balance: number;
+  profitLoss: number;
+  equity: number;
+  recentTransactions: Transaction[];
+}

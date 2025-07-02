@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type ContactFormValues } from './types';
+import { ContactFormSchema, type ContactFormValues, type DashboardData } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -112,6 +112,52 @@ export async function getImageByContextTag(tag: string): Promise<{ imageUrl: str
   } catch (error) {
     console.error(`Database error fetching image with tag "${tag}":`, error);
     return null; // Return null on error to avoid breaking the page
+  } finally {
+    client.release();
+  }
+}
+
+export async function getDashboardData(firebaseUid: string): Promise<DashboardData | null> {
+  if (!firebaseUid) return null;
+
+  const client = await db.getClient();
+  try {
+    const userQuery = 'SELECT id, username FROM users WHERE firebase_auth_uid = $1';
+    const userResult = await client.query(userQuery, [firebaseUid]);
+
+    if (userResult.rows.length === 0) {
+      console.error(`No user found with firebase_auth_uid: ${firebaseUid}`);
+      return null;
+    }
+    const user = userResult.rows[0];
+
+    const walletQuery = 'SELECT balance, profit_loss_balance FROM wallets WHERE user_id = $1';
+    const walletResult = await client.query(walletQuery, [user.id]);
+
+    // It's possible a user exists but a wallet doesn't, let's provide defaults.
+    const wallet = walletResult.rows.length > 0 ? walletResult.rows[0] : { balance: '0', profit_loss_balance: '0' };
+    const balance = parseFloat(wallet.balance);
+    const profitLoss = parseFloat(wallet.profit_loss_balance);
+
+    const transactionsQuery = `
+      SELECT id, transaction_type, amount_usd_equivalent, status, processed_at
+      FROM transactions
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 5;
+    `;
+    const transactionsResult = await client.query(transactionsQuery, [user.id]);
+
+    return {
+      username: user.username,
+      balance: balance,
+      profitLoss: profitLoss,
+      equity: balance + profitLoss,
+      recentTransactions: transactionsResult.rows,
+    };
+  } catch (error) {
+    console.error('Database error fetching dashboard data:', error);
+    return null;
   } finally {
     client.release();
   }
