@@ -8,7 +8,6 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: "Apexora FX Hub",
   description: "Your gateway to global financial markets.",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({
