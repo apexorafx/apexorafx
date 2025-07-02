@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import "./globals.css";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthContextProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { ConditionalLayout } from "@/components/layout/conditional-layout";
 
 export const metadata: Metadata = {
   title: "Apexora FX Hub",
@@ -39,11 +38,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthContextProvider>
-            <div className="relative flex min-h-dvh flex-col bg-background">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <ConditionalLayout>{children}</ConditionalLayout>
             <Toaster />
           </AuthContextProvider>
         </ThemeProvider>
