@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema, type DepositFormValues, DepositFormSchema } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema, type DepositFormValues, type TransactionHistoryEntry } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -168,7 +168,7 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
     const totalAssets = balance + profitLoss;
 
     const transactionsQuery = `
-      SELECT id, transaction_type, amount_usd_equivalent, status, processed_at
+      SELECT id, transaction_type, amount_usd_equivalent, status, created_at as processed_at
       FROM transactions
       WHERE user_id = $1
       ORDER BY created_at DESC
@@ -469,6 +469,29 @@ export async function createDepositTransaction(data: { userId: string; amountUSD
   } catch (error) {
     console.error('Database error creating deposit transaction:', error);
     return { success: false, message: 'An internal error occurred.' };
+  } finally {
+    client.release();
+  }
+}
+
+export async function getTransactionHistory(userId: string): Promise<TransactionHistoryEntry[]> {
+  if (!userId) {
+    console.error("getTransactionHistory called without userId");
+    return [];
+  }
+  const client = await db.getClient();
+  try {
+    const query = `
+      SELECT id, created_at, transaction_type, asset_name, amount_crypto, amount_usd_equivalent, status, description
+      FROM transactions
+      WHERE user_id = $1
+      ORDER BY created_at DESC;
+    `;
+    const result = await client.query(query, [userId]);
+    return result.rows as TransactionHistoryEntry[];
+  } catch (error) {
+    console.error('Database error fetching transaction history:', error);
+    return [];
   } finally {
     client.release();
   }

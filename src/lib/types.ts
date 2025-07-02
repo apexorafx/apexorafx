@@ -134,3 +134,14 @@ export const BTCWithdrawalFormSchema = z.object({
   notes: z.string().optional(),
 });
 export type BTCWithdrawalFormValues = z.infer<typeof BTCWithdrawalFormSchema>;
+
+export interface TransactionHistoryEntry {
+  id: string;
+  created_at: string;
+  transaction_type: string;
+  asset_name: string | null;
+  amount_crypto: string | null;
+  amount_usd_equivalent: string;
+  status: string;
+  description: string | null;
+}
