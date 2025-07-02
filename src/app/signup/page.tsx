@@ -63,7 +63,7 @@ export default function SignupPage() {
         return;
       }
 
-      router.push('/dashboard');
+      router.push('/signup-details');
     } catch (error: any) {
       console.error('Signup failed', error);
       let description = 'An unexpected error occurred. Please try again.';

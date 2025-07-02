@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -214,7 +214,7 @@ export async function updateUserProfile(firebaseUid: string, data: UpdateProfile
 
   const client = await db.getClient();
   try {
-    const fieldsToUpdate = Object.entries(parsed.data).filter(([, value]) => value !== undefined);
+    const fieldsToUpdate = Object.entries(parsed.data).filter(([, value]) => value !== undefined && value !== '');
 
     if (fieldsToUpdate.length === 0) {
       return { success: true, message: 'No changes were made.', user: null };
@@ -304,6 +304,44 @@ export async function stopCopyingTrader(userId: string, traderId: string) {
   } catch (error) {
     console.error('Database error stopping copy trade:', error);
     throw new Error('Could not stop copying trader.');
+  } finally {
+    client.release();
+  }
+}
+
+export async function completeUserProfile(firebaseUid: string, data: CompleteProfileFormValues) {
+  const parsed = CompleteProfileSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return { success: false, message: "Invalid form data.", errors: parsed.error.flatten() };
+  }
+
+  const { tradingPlanId, firstName, lastName, phoneNumber, countryCode } = parsed.data;
+  const client = await db.getClient();
+  try {
+    const query = `
+      UPDATE users
+      SET
+        trading_plan_id = $1,
+        first_name = $2,
+        last_name = $3,
+        phone_number = $4,
+        country_code = $5,
+        profile_completed_at = NOW()
+      WHERE firebase_auth_uid = $6
+      RETURNING *;
+    `;
+    const values = [tradingPlanId, firstName, lastName, phoneNumber, countryCode, firebaseUid];
+    const result = await client.query(query, values);
+
+    if (result.rows.length > 0) {
+      return { success: true, user: result.rows[0] as AppUser };
+    } else {
+      return { success: false, message: 'User not found or update failed.' };
+    }
+  } catch (error) {
+    console.error('Database error completing user profile:', error);
+    return { success: false, message: 'An internal server error occurred.' };
   } finally {
     client.release();
   }

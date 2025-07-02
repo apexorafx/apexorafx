@@ -65,7 +65,7 @@ export const UpdateProfileSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters").max(100).optional(),
   lastName: z.string().min(2, "Last name must be at least 2 characters").max(100).optional(),
   username: z.string().min(3, "Username must be at least 3 characters").max(20).regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores.").optional(),
-  phoneNumber: z.string().max(50).optional(),
+  phoneNumber: z.string().max(50).optional().nullable(),
   countryCode: z.string().length(2, "Invalid country code").optional(),
 });
 
@@ -83,3 +83,13 @@ export interface Trader {
   joined: string;
   strategy: string;
 }
+
+export const CompleteProfileSchema = z.object({
+  tradingPlanId: z.coerce.number().min(1, "Please select a trading plan."),
+  firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
+  lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
+  phoneNumber: z.string().optional(),
+  countryCode: z.string().length(2, "Please select your country."),
+});
+
+export type CompleteProfileFormValues = z.infer<typeof CompleteProfileSchema>;

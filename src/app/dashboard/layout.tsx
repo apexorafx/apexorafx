@@ -4,7 +4,7 @@
 import { useAuth } from "@/context/auth-context";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -15,20 +15,24 @@ export default function DashboardLayout({
 }) {
   const { appUser, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+
+  const profileIsComplete = !!appUser?.profile_completed_at;
 
   useEffect(() => {
     if (loading) {
-      return;
+      return; // Wait for auth state to be resolved
     }
     if (!appUser) {
-        router.push(`/login?redirect=${pathname}`);
+        // Not logged in, redirect to login
+        router.push(`/login`);
+    } else if (!profileIsComplete) {
+        // Logged in, but profile is not complete
+        router.push('/signup-details');
     }
-    // In the future, we can add checks for profile completion here
-    // e.g., if (!appUser.profile_completed_at) router.push('/complete-profile');
-  }, [appUser, loading, router, pathname]);
+  }, [appUser, loading, router, profileIsComplete]);
 
-  if (loading || !appUser) {
+  // Show loader while waiting for auth or if user needs redirection
+  if (loading || !appUser || !profileIsComplete) {
     return (
        <div className="flex h-screen items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -36,6 +40,7 @@ export default function DashboardLayout({
     );
   }
 
+  // Render dashboard for authenticated and fully onboarded users
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <DashboardSidebar />
