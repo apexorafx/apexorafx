@@ -53,8 +53,10 @@ export interface Transaction {
 
 export interface DashboardData {
   username: string;
-  balance: number;
+  totalAssets: number;
+  totalDeposited: number;
   profitLoss: number;
-  equity: number;
+  totalWithdrawn: number;
+  activeCopyTrades: number;
   recentTransactions: Transaction[];
 }

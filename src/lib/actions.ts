@@ -133,11 +133,11 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
 
     const walletQuery = 'SELECT balance, profit_loss_balance FROM wallets WHERE user_id = $1';
     const walletResult = await client.query(walletQuery, [user.id]);
-
-    // It's possible a user exists but a wallet doesn't, let's provide defaults.
+    
     const wallet = walletResult.rows.length > 0 ? walletResult.rows[0] : { balance: '0', profit_loss_balance: '0' };
     const balance = parseFloat(wallet.balance);
     const profitLoss = parseFloat(wallet.profit_loss_balance);
+    const totalAssets = balance + profitLoss;
 
     const transactionsQuery = `
       SELECT id, transaction_type, amount_usd_equivalent, status, processed_at
@@ -147,12 +147,19 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
       LIMIT 5;
     `;
     const transactionsResult = await client.query(transactionsQuery, [user.id]);
+    
+    // Mocked data for new fields
+    const totalDeposited = 65000.00;
+    const totalWithdrawn = 0.00;
+    const activeCopyTrades = 0;
 
     return {
       username: user.username,
-      balance: balance,
-      profitLoss: profitLoss,
-      equity: balance + profitLoss,
+      totalAssets,
+      totalDeposited,
+      profitLoss,
+      totalWithdrawn,
+      activeCopyTrades,
       recentTransactions: transactionsResult.rows,
     };
   } catch (error) {
