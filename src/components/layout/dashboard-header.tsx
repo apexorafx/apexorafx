@@ -6,7 +6,7 @@ import { useAuth } from '@/context/auth-context';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Bell,
   LayoutGrid,
@@ -74,12 +74,13 @@ export function DashboardHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
-            <div className="h-16 flex items-center px-6 border-b">
+            <SheetHeader className="h-16 flex items-center px-6 border-b">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <Link href="/" className="flex items-center space-x-2">
                 <ApexoraLogo className="h-8 w-8 text-primary" />
                 <span className="text-xl font-bold font-headline">Apexora</span>
                 </Link>
-            </div>
+            </SheetHeader>
             <nav className="flex-1 px-4 py-6">
                 <ul className="space-y-2">
                 {navItems.map((item) => (
