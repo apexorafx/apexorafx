@@ -52,7 +52,6 @@ export default function SignupPage() {
           type: "manual",
           message: "This username is already taken. Please choose another.",
         });
-        setLoading(false);
         return;
       }
       
@@ -83,7 +82,6 @@ export default function SignupPage() {
                 description: dbUserResult.message || "Could not create user profile. Please try again.",
             });
         }
-        setLoading(false);
         return;
       }
 
