@@ -6,28 +6,19 @@ import { Github, Twitter, Linkedin } from "lucide-react";
 
 const sections = [
   {
-    title: "Markets",
+    title: "Features",
     links: [
-      { label: "Forex", href: "/markets" },
-      { label: "Shares", href: "/markets" },
-      { label: "Commodities", href: "/markets" },
-      { label: "Indices", href: "/markets" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
+      { label: "Markets", href: "/markets" },
+      { label: "Copy Trading", href: "/copy-trading" },
       { label: "AI Insights", href: "/ai-insights" },
-      { label: "Courses", href: "/resources" },
-      { label: "Webinars", href: "/resources" },
-      { label: "E-books", href: "/resources" },
+      { label: "Pricing", href: "/pricing" },
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About Us", href: "/about" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "Resources", href: "/resources" },
       { label: "Contact Us", href: "/contact" },
     ],
   },
@@ -66,7 +57,7 @@ export function Footer() {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 lg:col-span-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 lg:col-span-2 lg:grid-cols-3">
             {sections.map((section) => (
               <div key={section.title}>
                 <h3 className="font-headline font-semibold tracking-wider text-foreground">
