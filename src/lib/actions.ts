@@ -1,7 +1,7 @@
 
 'use server';
 import { z } from 'zod';
-import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues } from './types';
+import { ContactFormSchema, type AppUser, type ContactFormValues, type DashboardData, UpdateProfileSchema, type UpdateProfileFormValues, CompleteProfileSchema, type CompleteProfileFormValues, SetupPinSchema } from './types';
 import { db } from './db';
 import { Resend } from 'resend';
 
@@ -13,7 +13,7 @@ export async function submitContactForm(values: ContactFormValues) {
     }
     
     const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey || apiKey === 'YOUR_RESEND_API_KEY') {
+    if (!apiKey || apiKey === 'YOUR_RESEND_API_KEY' || apiKey.trim() === '') {
       console.error('Resend API Key is not configured.');
       return { success: false, message: 'This feature is not available at the moment. Please contact us directly.' };
     }
@@ -369,6 +369,42 @@ export async function completeUserProfile(firebaseUid: string, data: CompletePro
     }
   } catch (error) {
     console.error('Database error completing user profile:', error);
+    return { success: false, message: 'An internal server error occurred.' };
+  } finally {
+    client.release();
+  }
+}
+
+export async function completePinSetup(firebaseUid: string, pin: string) {
+  const parsed = SetupPinSchema.safeParse({ pin, confirmPin: pin }); // Re-validate on server
+  if (!parsed.success) {
+      return { success: false, message: "Invalid PIN format." };
+  }
+
+  // In a real app, you would hash and store the pin securely.
+  // For this demo, we'll just mark the step as complete.
+  if (!firebaseUid) {
+    return { success: false, message: 'User session not found.' };
+  }
+
+  const client = await db.getClient();
+  try {
+    const query = `
+      UPDATE users
+      SET
+        pin_setup_completed_at = NOW()
+      WHERE firebase_auth_uid = $1
+      RETURNING *;
+    `;
+    const result = await client.query(query, [firebaseUid]);
+
+    if (result.rows.length > 0) {
+      return { success: true, user: result.rows[0] as AppUser };
+    } else {
+      return { success: false, message: 'User not found or update failed.' };
+    }
+  } catch (error) {
+    console.error('Database error completing PIN setup:', error);
     return { success: false, message: 'An internal server error occurred.' };
   } finally {
     client.release();

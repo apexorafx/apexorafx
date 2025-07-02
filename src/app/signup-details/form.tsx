@@ -24,13 +24,13 @@ import { Label } from '@/components/ui/label';
 export function SignupDetailsForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const { appUser, updateAppUser } = useAuth();
+  const { appUser, updateAppUser, loading: authIsLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CompleteProfileFormValues>({
     resolver: zodResolver(CompleteProfileSchema),
     defaultValues: {
-      tradingPlanId: 1, // Default to beginner
+      tradingPlanId: 3, // Default to Standard
       firstName: '',
       lastName: '',
       phoneNumber: '',
@@ -56,9 +56,9 @@ export function SignupDetailsForm() {
         updateAppUser(result.user);
         toast({
           title: 'Profile Completed!',
-          description: 'Welcome to your dashboard.',
+          description: "Next, let's secure your account with a PIN.",
         });
-        router.push('/dashboard');
+        router.push('/setup-pin'); // Go to PIN setup next
       } else {
         toast({
           variant: 'destructive',
@@ -78,6 +78,8 @@ export function SignupDetailsForm() {
     }
   }
 
+  const isDisabled = authIsLoading || isSubmitting;
+
   return (
     <Card className="p-6 sm:p-8">
       <Form {...form}>
@@ -92,7 +94,7 @@ export function SignupDetailsForm() {
                   <RadioGroup
                     onValueChange={(value) => field.onChange(parseInt(value))}
                     defaultValue={String(field.value)}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
                   >
                     {tradingPlans.map((plan) => (
                       <FormItem key={plan.id}>
@@ -103,14 +105,15 @@ export function SignupDetailsForm() {
                             htmlFor={`plan-${plan.id}`}
                             className={cn(
                                 "flex flex-col rounded-lg border-2 bg-card p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary",
-                                "cursor-pointer"
+                                "cursor-pointer transition-colors"
                             )}
                          >
                             <div className="flex items-center justify-between">
                                 <span className="font-bold">{plan.name}</span>
+                                <span className="text-lg font-bold">{plan.price}</span>
                             </div>
+                            <p className="text-sm text-muted-foreground mt-1">{plan.priceDescription}</p>
                             <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
-                            <p className="text-sm font-semibold mt-2">{plan.priceDescription}</p>
                          </Label>
                       </FormItem>
                     ))}
@@ -185,14 +188,14 @@ export function SignupDetailsForm() {
               />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
+          <Button type="submit" className="w-full" disabled={isDisabled}>
+            {isDisabled ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
-              'Complete Profile'
+              'Continue to PIN Setup'
             )}
           </Button>
         </form>

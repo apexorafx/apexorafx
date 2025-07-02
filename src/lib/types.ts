@@ -93,3 +93,13 @@ export const CompleteProfileSchema = z.object({
 });
 
 export type CompleteProfileFormValues = z.infer<typeof CompleteProfileSchema>;
+
+export const SetupPinSchema = z.object({
+  pin: z.string().length(4, "PIN must be exactly 4 digits.").regex(/^\d{4}$/, "PIN must be numeric."),
+  confirmPin: z.string(),
+}).refine((data) => data.pin === data.confirmPin, {
+  message: "PINs do not match.",
+  path: ["confirmPin"],
+});
+
+export type SetupPinFormValues = z.infer<typeof SetupPinSchema>;
