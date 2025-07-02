@@ -148,10 +148,13 @@ export async function getDashboardData(firebaseUid: string): Promise<DashboardDa
     `;
     const transactionsResult = await client.query(transactionsQuery, [user.id]);
     
-    // Mocked data for new fields
+    const copyTradesQuery = 'SELECT COUNT(*) FROM user_copied_traders WHERE user_id = $1';
+    const copyTradesResult = await client.query(copyTradesQuery, [user.id]);
+    const activeCopyTrades = parseInt(copyTradesResult.rows[0].count, 10);
+    
+    // Mocked data for now
     const totalDeposited = 65000.00;
     const totalWithdrawn = 0.00;
-    const activeCopyTrades = 0;
 
     return {
       username: user.username,
