@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { getImageByContextTag } from "@/lib/actions";
 import { tradingPlans } from "@/lib/plans";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Bot, BookOpen, Check, LineChart, ShieldCheck, Globe, Landmark, Coins, Wheat, BarChartHorizontal, UserPlus, DollarSign, TrendingUp } from "lucide-react";
+import { ArrowRight, Bot, Users, Check, LineChart, ShieldCheck, Globe, Landmark, Coins, Wheat, BarChartHorizontal, UserPlus, DollarSign, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -24,10 +24,10 @@ const features = [
     link: "/ai-insights",
   },
   {
-    icon: <BookOpen className="w-8 h-8 text-primary" />,
-    title: "Resource Center",
-    description: "Educate yourself with our comprehensive library of learning materials.",
-    link: "/resources",
+    icon: <Users className="w-8 h-8 text-primary" />,
+    title: "Copy Trading",
+    description: "Replicate the strategies of top traders automatically in your own portfolio.",
+    link: "/copy-trading",
   },
   {
     icon: <ShieldCheck className="w-8 h-8 text-primary" />,
@@ -118,7 +118,7 @@ export default async function Home() {
                         <Link href="/signup">Start Trading Now</Link>
                     </Button>
                     <Button asChild size="lg" variant="outline" className="font-bold">
-                        <Link href="/resources">Explore Resources</Link>
+                        <Link href="/copy-trading">Explore Copy Trading</Link>
                     </Button>
                 </div>
             </div>

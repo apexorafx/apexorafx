@@ -16,7 +16,6 @@ const navLinks = [
   { href: "/markets", label: "Markets" },
   { href: "/copy-trading", label: "Copy Trading" },
   { href: "/ai-insights", label: "AI Insights" },
-  { href: "/resources", label: "Resources" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
