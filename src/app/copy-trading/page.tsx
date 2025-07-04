@@ -34,19 +34,31 @@ export default async function CopyTradingPage() {
     return (
         <div className="bg-background">
             {/* Hero Section */}
-            <section className="py-20 md:py-32 text-center bg-secondary/50">
-                <div className="container mx-auto px-4">
-                <h1 className="text-4xl md:text-6xl font-extrabold font-headline tracking-tight text-foreground">
-                    Trade Like a Pro with <span className="text-primary">Copy Trading</span>
-                </h1>
-                <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-                    Tap into the expertise of seasoned traders. Automatically replicate their strategies in your own portfolio and unlock your trading potential.
-                </p>
-                 <div className="mt-8">
-                    <Button asChild size="lg" className="font-bold">
-                        <Link href="/signup">Start Copying Now</Link>
-                    </Button>
+            <section className="relative py-20 md:py-32 bg-background text-foreground text-center">
+                <div className="absolute inset-0">
+                    <Image
+                        src={heroImage?.imageUrl || "https://placehold.co/1920x1080.png"}
+                        alt={heroImage?.altText || "Social trading network concept"}
+                        data-ai-hint="social trading network"
+                        fill
+                        className="object-cover opacity-10 dark:opacity-20"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
                 </div>
+
+                <div className="container mx-auto px-4 text-center relative z-10">
+                    <h1 className="text-4xl md:text-6xl font-extrabold font-headline tracking-tight text-foreground">
+                        Trade Like a Pro with <span className="text-primary">Copy Trading</span>
+                    </h1>
+                    <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                        Tap into the expertise of seasoned traders. Automatically replicate their strategies in your own portfolio and unlock your trading potential.
+                    </p>
+                    <div className="mt-8">
+                        <Button asChild size="lg" className="font-bold">
+                            <Link href="/signup">Start Copying Now</Link>
+                        </Button>
+                    </div>
                 </div>
             </section>
 

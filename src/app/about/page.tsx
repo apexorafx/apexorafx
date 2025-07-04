@@ -23,16 +23,28 @@ const values = [
 ];
 
 export default async function AboutPage() {
-  const [storyImage, securityImage] = await Promise.all([
+  const [storyImage, securityImage, heroImage] = await Promise.all([
     getImageByContextTag('about_page_generic_promo', 'modern office'),
     getImageByContextTag('about_page_security_promo', 'security shield'),
+    getImageByContextTag('about_page_hero', 'corporate building cityscape'),
   ]);
 
   return (
     <div className="bg-background">
       {/* Hero Section */}
-      <section className="py-20 md:py-32 text-center bg-secondary/50">
-        <div className="container mx-auto px-4">
+      <section className="relative py-20 md:py-32 bg-background text-foreground text-center">
+        <div className="absolute inset-0">
+            <Image
+                src={heroImage?.imageUrl || "https://placehold.co/1920x1080.png"}
+                alt={heroImage?.altText || "About Apexora FX Hub"}
+                data-ai-hint="corporate building cityscape"
+                fill
+                className="object-cover opacity-10 dark:opacity-20"
+                priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-4xl md:text-6xl font-extrabold font-headline tracking-tight text-foreground">
             About <span className="text-primary">Apexora FX Hub</span>
           </h1>
