@@ -97,15 +97,29 @@ const getStartedSteps = [
 ];
 
 export default async function Home() {
-  const platformImage = await getImageByContextTag('trading_platforms_overview_main', 'trading dashboard');
+  const [platformImage, heroImage, aiImage] = await Promise.all([
+    getImageByContextTag('trading_platforms_overview_main', 'trading dashboard'),
+    getImageByContextTag('homepage_hero_main', 'global finance network'),
+    getImageByContextTag('homepage_ai_promo', 'artificial intelligence brain'),
+  ]);
   
   return (
     <div className="flex flex-col min-h-dvh">
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative py-20 md:py-32 bg-background">
-            <div className="absolute inset-0 bg-grid-slate-900/[0.04] bg-[10px_10px] dark:bg-grid-slate-400/[0.05]"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+        <section className="relative py-20 md:py-32 bg-background text-foreground">
+            <div className="absolute inset-0">
+                <Image
+                    src={heroImage?.imageUrl || "https://placehold.co/1920x1080.png"}
+                    alt={heroImage?.altText || "Global financial markets background"}
+                    data-ai-hint="global finance network"
+                    fill
+                    className="object-cover opacity-10 dark:opacity-20"
+                    priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+            </div>
+
             <div className="container mx-auto px-4 text-center relative z-10">
                 <h1 className="text-4xl md:text-6xl font-extrabold font-headline tracking-tight text-foreground">
                     Navigate the Global Markets with <span className="text-primary">Confidence</span>
@@ -177,10 +191,10 @@ export default async function Home() {
             </div>
         </section>
 
-        {/* Visual Section */}
+        {/* Visual Section - Platform */}
         <section className="py-16 md:py-24 bg-background">
             <div className="container mx-auto px-4">
-                <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div>
                         <h2 className="text-3xl md:text-4xl font-bold font-headline">One Platform, Infinite Possibilities</h2>
                         <p className="mt-4 text-lg text-muted-foreground">Our state-of-the-art trading platform provides you with all the tools you need for success. Enjoy fast execution, advanced charting, and a user-friendly interface designed for both beginners and experts.</p>
@@ -215,9 +229,48 @@ export default async function Home() {
                 </div>
             </div>
         </section>
+        
+        {/* Visual Section - AI */}
+        <section className="py-16 md:py-24 bg-secondary/50">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="mt-8 md:mt-0">
+                    <Image
+                        src={aiImage?.imageUrl || "https://placehold.co/600x400.png"}
+                        alt={aiImage?.altText || "AI powered trading insights"}
+                        data-ai-hint="artificial intelligence brain"
+                        width={600}
+                        height={400}
+                        className="rounded-lg shadow-2xl"
+                    />
+                </div>
+                <div>
+                    <h2 className="text-3xl md:text-4xl font-bold font-headline">Harness the Power of AI</h2>
+                    <p className="mt-4 text-lg text-muted-foreground">Gain a competitive edge with our sophisticated AI-driven analytics. Our platform processes vast amounts of market data to deliver actionable insights, helping you spot opportunities and manage risk effectively.</p>
+                    <ul className="mt-6 space-y-4">
+                        <li className="flex items-start">
+                            <Check className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                            <span><span className="font-bold">Trend Prediction:</span> Identify potential market movements before they happen.</span>
+                        </li>
+                        <li className="flex items-start">
+                            <Check className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                            <span><span className="font-bold">Personalized Alerts:</span> Get custom notifications based on your trading style and preferences.</span>
+                        </li>
+                        <li className="flex items-start">
+                            <Check className="w-6 h-6 text-financial-green mr-3 mt-1 flex-shrink-0" />
+                            <span><span className="font-bold">Risk Assessment:</span> Understand the potential risk of every trade with AI analysis.</span>
+                        </li>
+                    </ul>
+                    <Button asChild size="lg" className="mt-8 font-bold">
+                        <Link href="/ai-insights">Explore AI Insights</Link>
+                    </Button>
+                </div>
+            </div>
+          </div>
+        </section>
 
         {/* Trading Plans Section */}
-        <section className="py-16 md:py-24 bg-secondary/50">
+        <section className="py-16 md:py-24 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Find the Right Plan for You</h2>
@@ -262,7 +315,7 @@ export default async function Home() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="py-16 md:py-24 bg-background">
+        <section className="py-16 md:py-24 bg-secondary/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold font-headline">Trusted by Traders Worldwide</h2>
@@ -291,7 +344,7 @@ export default async function Home() {
         </section>
         
         {/* Get Started Section */}
-        <section className="py-16 md:py-24 bg-secondary/50">
+        <section className="py-16 md:py-24 bg-background">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
                     <h2 className="text-3xl md:text-4xl font-bold font-headline">Get Started in 3 Simple Steps</h2>
